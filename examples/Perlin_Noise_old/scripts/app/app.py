@@ -15,8 +15,8 @@ from scripts.UI.text import Text, singleline_text
 
 # from scripts.app.sprite import Sprite, load_layers
 
-from World import World
-from Camera import Camera
+from PyWire3D.World.World import World
+from PyWire3D.Camera.Camera import Camera
 
 from scripts.utilities.data import Data
 # from scripts.utilities.position import random2D, multiply2D, add2D
@@ -107,8 +107,8 @@ class App:
             pass
 
         elif self.state == 1:
-            self.app_data.world.update(self.data.dt)
-            self.app_data.camera.update(self.data.dt)
+            self.app_data.world.update()
+            self.app_data.camera.update()
 
             if self.data.keyboard.just_pressed('escape'):
                 self.menu()
@@ -121,34 +121,34 @@ class App:
 
             # temp
             if self.data.keyboard.get_key('a'):
-                self.app_data.camera.translate([-0.1, 0, 0])
+                self.app_data.camera.move([-0.1, 0, 0])
             
             if self.data.keyboard.get_key('d'):
-                self.app_data.camera.translate([0.1, 0, 0])
+                self.app_data.camera.move([0.1, 0, 0])
                 
             if self.data.keyboard.get_key('w'):
-                self.app_data.camera.translate([0, 0, 0.1])
+                self.app_data.camera.move([0, 0, 0.1])
                 
             if self.data.keyboard.get_key('s'):
-                self.app_data.camera.translate([0, 0, -0.1])
+                self.app_data.camera.move([0, 0, -0.1])
                 
             if self.data.keyboard.get_key('up'):
-                self.app_data.camera.translate([0, -0.05, 0])
+                self.app_data.camera.move([0, 0.05, 0])
                 
             if self.data.keyboard.get_key('down'):
-                self.app_data.camera.translate([0, 0.05, 0])
+                self.app_data.camera.move([0, -0.05, 0])
 
             if (self.data.keyboard.get_key('right')):
-                self.app_data.camera.angle[1] += 0.02
+                self.app_data.camera.rotate([0, 0.03, 0])
                 
             if (self.data.keyboard.get_key('left')):
-                self.app_data.camera.angle[1] -= 0.02
-                
-            if (self.data.keyboard.get_key('backspace')):
-                self.app_data.camera.angle[0] += 0.02
+                self.app_data.camera.rotate([0, -0.03, 0])
                 
             if (self.data.keyboard.get_key('delete')):
-                self.app_data.camera.angle[0] -= 0.02
+                self.app_data.camera.rotate([0.03, 0, 0])
+                
+            if (self.data.keyboard.get_key('backspace')):
+                self.app_data.camera.rotate([-0.03, 0, 0])
 
     def render(self):
         self.data.displaySurface.fill(self.CONSTANTS.COLOURS.GREY)
@@ -201,12 +201,5 @@ class App:
 
         self.elements = []
 
-        FOV = math.radians(90)
-        f = self.CONSTANTS.DISPLAY_SIZE[0] / (2 * math.tan(FOV / 2))
-
-        self.app_data.camera = Camera(clip=[2,32], f=f)
+        self.app_data.camera = Camera(display_size=self.CONSTANTS.DISPLAY_SIZE, position=[4, 4, 0], clip=[1,32], flip_y=True)
         self.app_data.world = World(self.app_data.camera)
-
-        # temp
-        self.app_data.camera.fov = FOV
-        self.app_data.camera.display_size = self.CONSTANTS.DISPLAY_SIZE

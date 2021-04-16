@@ -1,5 +1,5 @@
 from numpy import matrix as np_matrix
-from math import sin, cos, tan, sqrt
+from math import sin, cos, tan
 
 def add(*args):
     '''
@@ -33,6 +33,9 @@ def rotate_point_3d(point, rotation_matrix):
             [point[2]]
         ]
     )
+
+def matrix_to_list_3d(matrix):
+    return [matrix.item(0), matrix.item(1), matrix.item(2)]
 
 def get_rotation_matrix_3d(angle):
     '''
@@ -75,8 +78,53 @@ def get_rotation_matrix_3d(angle):
 
     return rotate_x * rotate_y * rotate_z
 
-def get_distance_3d(a, b):
+def get_rotation_matrix_3d_x(x):
     '''
-    Returns the distance from 3D point A to 3D point B.
+    Returns the 3D rotation matrix for the angle x (a rotation around the x axis).
     '''
-    return sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2 + (a[2] - b[2]) ** 2)
+    s_ax = sin(x)
+    c_ax = cos(x)
+
+    return np_matrix(
+        [
+            [1, 0, 0],
+            [0, c_ax, s_ax],
+            [0, -s_ax, c_ax]
+        ]
+    )
+    
+def get_rotation_matrix_3d_y(y):
+    '''
+    Returns the 3D rotation matrix for the angle y (a rotation around the y axis).
+    '''
+    s_ay = sin(y)
+    c_ay = cos(y)
+
+    return np_matrix(
+        [
+            [c_ay, 0, -s_ay],
+            [0, 1, 0],
+            [s_ay, 0, c_ay]
+        ]
+    )
+    
+def get_rotation_matrix_3d_z(z):
+    '''
+    Returns the 3D rotation matrix for the angle z (a rotation around the z axis).
+    '''
+    s_az = sin(z)
+    c_az = cos(z)
+
+    return np_matrix(
+        [
+            [c_az, s_az, 0],
+            [-s_az, c_az, 0],
+            [0, 0, 1]
+        ]
+    )
+
+def get_square_distance_3d(a, b):
+    '''
+    Returns the square of the distance from 3D point A to 3D point B.
+    '''
+    return (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2 + (a[2] - b[2]) ** 2

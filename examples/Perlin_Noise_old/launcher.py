@@ -7,7 +7,7 @@ if __name__ == '__main__':
     else:
         execPath = dirname(__file__)
         sys.path.insert(0, execPath)
-        sys.path.insert(0, join(execPath,'..','..','Scripts'))
+        sys.path.insert(0, join(execPath,'..','..','src'))
 
     from scripts.main.main import main
 
