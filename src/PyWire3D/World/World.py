@@ -1,14 +1,9 @@
-## NOTE: very unfinished
-
-from PyWire3D.Wireframe.Node import Node
-from PyWire3D.Wireframe.Polygon import Polygon
-from PyWire3D.World.Chunk import Chunk
 from PyWire3D.Utilities.Vector import get_square_distance_3d
 
-SEA_LEVEL = -1
+# Note: still very much a work-in-progress
 
 class World:
-    def __init__(self, camera, chunk_size=8):
+    def __init__(self, camera, chunk_size=8, chunk_spawn_radius=8):#, seed=0
         self.camera = camera
 
         self.loaded_chunks = []
@@ -18,9 +13,31 @@ class World:
 
         self.chunk_size = chunk_size
 
-        # self.seed = 0
+        self.chunk_spawn_radius = chunk_spawn_radius
+
+        # self.seed = seed
         
-    def update(self):#, dt
+    def update(self):
+        # Calculate chunks we need to be loaded/unloaded
+        chunks_required = []
+
+        center_x = self.camera.position[0] // self.chunk_size
+        center_y = self.camera.position[2] // self.chunk_size
+        
+        for x in range(-self.chunk_spawn_radius, self.chunk_spawn_radius + 1):
+            for y in range(-self.chunk_spawn_radius, self.chunk_spawn_radius + 1):
+                chunks_required.append([center_x + x, center_y + y])
+
+        for chunk in self.loaded_chunks:
+            if chunk.chunk_position in chunks_required:
+                chunks_required.remove(chunk.chunk_position)
+
+            else:
+                self.loaded_chunks.remove(chunk)
+
+        for chunk_position in chunks_required:
+            self.load_chunk(chunk_position)
+
         for chunk in self.loaded_chunks:
             chunk.update(self.camera)
 
@@ -40,15 +57,21 @@ class World:
             shape.render(display, self.camera)
 
     def load_chunk(self, position):
-        # load from data, for now just generate.
-        chunk = self.generate_chunk(position) # later, if already been generated before, load it from save file
-        self.loaded_chunks.append(chunk)
+        # Todo: allow previously generated but unloaded chunks to be cached, and quickly reloaded.
+        self.loaded_chunks.append(self.generate_chunk(position))
 
     def generate_chunk(self, chunk_position):
-        return self._chunk_generator(self, chunk_position)
+        '''
+        Calls the method set by set_chunk_generator - if set_chunk_generator has not been called prior to calling this method, it will fail.
+        '''
+        if self._chunk_generator is not None:
+            return self._chunk_generator(self, chunk_position)
+        
+        else:
+            raise RuntimeError('set_chunk_generator must be called before generate_chunk')
 
     def set_chunk_generator(self, chunk_generator):
         '''
-        Sets the chunk generator function, which is called when new chunks need to be created.
+        Sets the chunk generator method, which is called when new chunks need to be created.
         '''
         self._chunk_generator = chunk_generator

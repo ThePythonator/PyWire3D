@@ -16,6 +16,7 @@ from PyWire3D.Wireframe.Polygon import Polygon
 # Used in chunk generation
 SEA_LEVEL = -1
 
+# Custom chunk generator function - World class requires this.
 def custom_chunk_gen(world, chunk_position):
     # Generate nodes, which all polygons will then be based off.
     # Uses perlin noise to calculate the height of the nodes.
@@ -27,7 +28,7 @@ def custom_chunk_gen(world, chunk_position):
             actual_x = chunk_position[0] * world.chunk_size + x
             actual_z = chunk_position[1] * world.chunk_size + z
             
-            height = -noise.pnoise2(actual_x*0.05, actual_z*0.05, repeatx=2**32, repeaty=2**32) * 12
+            height = -noise.pnoise2(actual_x*0.05, actual_z*0.05, repeatx=2**32, repeaty=2**32) * 13
 
             if height < SEA_LEVEL:
                 height = SEA_LEVEL
@@ -47,7 +48,6 @@ def custom_chunk_gen(world, chunk_position):
             # Shade is used to add a bit of variation in to the colours, based on the height of the nodes.
             
             shade = n1.position[1] + n2.position[1] + n3.position[1] + n4.position[1]
-            shade *= -3
             shade = max(0, shade)
 
             if n1.position[1] == SEA_LEVEL and n3.position[1] == SEA_LEVEL:
@@ -57,19 +57,19 @@ def custom_chunk_gen(world, chunk_position):
                 if n2.position[1] == SEA_LEVEL:
                     polygons.append(Polygon([n1, n2, n3], colour=(0,20,230)))
                 else:
-                    polygons.append(Polygon([n1, n2, n3], colour=(shade // 3 + 10, 190 + shade // 2, shade)))
+                    polygons.append(Polygon([n1, n2, n3], colour=(shade // 2 + 20, 185 + shade, shade * 3)))
 
                 if n4.position[1] == SEA_LEVEL:
                     polygons.append(Polygon([n1, n3, n4], colour=(0,40,240)))
                 else:
-                    polygons.append(Polygon([n1, n3, n4], colour=(shade // 3 + 5, 200 + shade // 2, shade)))
+                    polygons.append(Polygon([n1, n3, n4], colour=(shade // 2 + 15, 195 + shade, shade * 3)))
 
             else:
-                polygons.append(Polygon([n1, n2, n3], colour=(shade // 3 + 10, 190 + shade // 2, shade)))
-                polygons.append(Polygon([n1, n3, n4], colour=(shade // 3 + 5, 200 + shade // 2, shade)))
+                polygons.append(Polygon([n1, n2, n3], colour=(shade // 2 + 20, 185 + shade, shade * 3)))
+                polygons.append(Polygon([n1, n3, n4], colour=(shade // 2 + 15, 195 + shade, shade * 3)))
     
-    chunk = Chunk(chunk_position, polygons, nodes)
-    return chunk
+    # Create and return chunk.
+    return Chunk(chunk_position, polygons, nodes)
 
 
 pygame.init()
@@ -81,17 +81,10 @@ display = pygame.display.set_mode((800, 500))
 pygame.display.set_caption('Perlin Noise Polygon Demo')
 
 # Pygame defines increasing y values to be downwards, so we need to flip it when rendering
-camera = Camera(display_size=(800,500), position=[0, 4, 0], clip=[0.5,24], flip_y=True)
+camera = Camera(display_size=(800,500), position=[4, 4, 4], clip=[0.5,24], flip_y=True)
 
-world = World(camera)
+world = World(camera, chunk_size=4, chunk_spawn_radius=4)
 world.set_chunk_generator(custom_chunk_gen)
-
-
-# Load some chunks for viewing (because currently chunks aren't loaded/unloaded based on distance):
-for i in range(-2,2):
-    for j in range(0,5):
-        world.load_chunk([i,j])
-
 
 # Main loop
 while True:
@@ -142,7 +135,8 @@ while True:
 
     world.render(display)
     
+    # Display fps
     fps_img = font.render(str(int(1/dt)), True, (50, 200, 150))
-    display.blit(fps_img, (560, 15))
+    display.blit(fps_img, (760, 15))
 
     pygame.display.flip()

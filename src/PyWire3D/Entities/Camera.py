@@ -1,22 +1,24 @@
 import math
 
+from PyWire3D.Entities.BaseEntity import BaseEntity
 from PyWire3D.Utilities.Vector import get_rotation_matrix_3d, rotate_point_3d, add, matrix_to_list_3d, get_rotation_matrix_3d_y
 
-class Camera:
+class Camera(BaseEntity):
     def __init__(self, display_size=[100,100], position=[0,0,0], angle=[0,0,0], clip=[0,64], fov=90, flip_y=False):
         '''
         A Camera class, used to calculate the projection location of nodes/shapes.
         '''
+        super().__init__(position=position)
+
         # Position and angle of camera
-        self.position = position.copy()
-        self.angle = angle.copy()
+        self.angle = angle
 
         # Clipping planes
         self.clip_near = clip[0]
         self.clip_far = clip[1]
 
         # Field of view
-        self.fov = fov
+        self.fov = math.radians(fov)
 
         # Distance from camera to display
         self.f = display_size[0] / (2 * math.tan(self.fov / 2))
@@ -40,12 +42,6 @@ class Camera:
         '''
         This doesn't do anything.
         '''
-
-    def translate(self, vector):
-        '''
-        Translate the camera by the vector [x, y, z].
-        '''
-        self.position = add(self.position, vector)
         
     def move(self, vector):
         '''
@@ -55,7 +51,7 @@ class Camera:
         # Currently broken?
         # self.position = add(self.position, matrix_to_list_3d(rotate_point_3d(vector, get_rotation_matrix_3d([-self.angle[0], -self.angle[1], -self.angle[2]]))))
         # self.position = add(self.position, matrix_to_list_3d(rotate_point_3d(vector, get_rotation_matrix_3d([0, -self.angle[1], 0]))))
-        self.position = add(self.position, matrix_to_list_3d(rotate_point_3d(vector, get_rotation_matrix_3d_y(-self.angle[1]))))
+        self.translate(matrix_to_list_3d(rotate_point_3d(vector, get_rotation_matrix_3d_y(-self.angle[1]))))
         # print(vector, matrix_to_list_3d(rotate_point_3d(vector, self.rotation_matrix)))
 
     def rotate(self, angle):
