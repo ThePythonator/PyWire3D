@@ -1,6 +1,6 @@
 import numpy
 
-from PyWire3D.Utilities.Vector import add
+from PyWire3D.Utilities.Vector import add_3d
 
 class BaseEntity:
     def __init__(self, position=[0, 0, 0], angle=[0, 0, 0]):
@@ -17,11 +17,11 @@ class BaseEntity:
         Translate the camera by the vector [x, y, z].
         '''
         # self.position += numpy.array(amount)
-        self.position = add(self.position, amount)
+        self.position = add_3d(self.position, amount)
         
     def rotate(self, amount):
         '''
         Rotate the camera by the angles [x, y, z].
         '''
         # self.angle += numpy.array(amount)
-        self.angle = add(self.angle, amount)
+        self.angle = add_3d(self.angle, amount)

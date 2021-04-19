@@ -1,18 +1,15 @@
 import math
-# import numpy
+import numpy
 
 from PyWire3D.Entities.BaseEntity import BaseEntity
-from PyWire3D.Utilities.Vector import get_rotation_matrix_3d, rotate_point_3d, add, matrix_to_list_3d, get_rotation_matrix_3d_y
+from PyWire3D.Utilities.Vector import get_rotation_matrix_3d, add_3d, matrix_to_list_3d, get_rotation_matrix_3d_y
 
 class Camera(BaseEntity):
     def __init__(self, display_size=[100,100], position=[0,0,0], angle=[0,0,0], clip=[0,64], fov=90, flip_y=False):
         '''
         A Camera class, used to calculate the projection location of nodes/shapes.
         '''
-        super().__init__(position=position)
-
-        # Position and angle of camera
-        self.angle = angle
+        super().__init__(position=position, angle=angle)
 
         # Clipping planes
         self.clip_near = clip[0]
@@ -29,6 +26,8 @@ class Camera(BaseEntity):
 
         # Used for centering
         self.display_size = display_size
+
+        self.display_size_half = (display_size[0] // 2, display_size[1] // 2)
 
         # Rotation of camera
         self.rotation_matrix = get_rotation_matrix_3d(self.angle)
@@ -52,11 +51,13 @@ class Camera(BaseEntity):
         # Currently broken?
         # self.position = add(self.position, matrix_to_list_3d(rotate_point_3d(vector, get_rotation_matrix_3d([-self.angle[0], -self.angle[1], -self.angle[2]]))))
         # self.position = add(self.position, matrix_to_list_3d(rotate_point_3d(vector, get_rotation_matrix_3d([0, -self.angle[1], 0]))))
-        self.translate(matrix_to_list_3d(rotate_point_3d(vector, get_rotation_matrix_3d_y(-self.angle[1]))))
         # print(vector, matrix_to_list_3d(rotate_point_3d(vector, self.rotation_matrix)))
 
+        # self.translate(matrix_to_list_3d(rotate_point_3d(vector, get_rotation_matrix_3d_y(-self.angle[1]))))
+        self.translate(matrix_to_list_3d(numpy.matmul(get_rotation_matrix_3d_y(-self.angle[1]), vector)))
+
     def rotate(self, angle):
-        self.angle = add(self.angle, angle)
+        self.angle = add_3d(self.angle, angle)
 
     def should_clip(self, z):
         '''
@@ -76,10 +77,9 @@ class Camera(BaseEntity):
             flip_y = self.flip_y
 
         difference = [point[0] - self.position[0], point[1] - self.position[1], point[2] - self.position[2]]
-        # difference = numpy.subtract(numpy.array(point), self.position)
 
-        d_x, d_y, d_z = matrix_to_list_3d(rotate_point_3d(difference, self.rotation_matrix))
-        # d_x, d_y, d_z = matrix_to_list_3d(numpy.multiply(self.rotation_matrix * difference))
+        d_x, d_y, d_z = matrix_to_list_3d(numpy.matmul(self.rotation_matrix, difference))
+        # d_x, d_y, d_z = matrix_to_list_3d(rotate_point_3d(difference, self.rotation_matrix))
 
         if d_z <= 0 or self.should_clip(d_z):
             return [0, 0, 0]
@@ -91,8 +91,8 @@ class Camera(BaseEntity):
             y = -y
 
         if offset_to_center:
-            x += self.display_size[0] // 2
-            y += self.display_size[1] // 2
+            x += self.display_size_half[0]
+            y += self.display_size_half[1]
 
         return [x, y, d_z]
 

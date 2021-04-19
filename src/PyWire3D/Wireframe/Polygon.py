@@ -5,7 +5,7 @@ if USE_GFX:
 
     def py_draw_polygon(display, colour, points):
         py_gfxdraw_trigon(display, *[int(points[i][j]) for i in range(3) for j in range(2)], colour)
-        # py_gfxdraw_trigon(display, int(nodes[0][0]), int(nodes[0][1]), int(nodes[1][0]), int(nodes[1][1]), int(nodes[2][0]), int(nodes[2][1]), colour)
+        # py_gfxdraw_trigon(display, int(points[0][0]), int(points[0][1]), int(points[1][0]), int(points[1][1]), int(points[2][0]), int(points[2][1]), colour)
 else:
     from pygame.draw import polygon as py_draw_polygon
 

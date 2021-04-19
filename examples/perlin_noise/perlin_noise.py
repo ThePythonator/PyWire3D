@@ -16,7 +16,7 @@ from PyWire3D.Wireframe.Polygon import Polygon
 # Used in chunk generation
 SEA_LEVEL = -1
 
-MOUNTAIN_LEVEL = 5
+MOUNTAIN_LEVEL = 4.5
 
 # Custom chunk generator function - World class requires this.
 def custom_chunk_gen(world, chunk_position):
@@ -52,7 +52,7 @@ def custom_chunk_gen(world, chunk_position):
             shade = n1.position[1] + n2.position[1] + n3.position[1] + n4.position[1]
             shade = max(0, shade)
 
-            shade2 = min(n1.position[1]*28, 255)
+            shade2 = min(n1.position[1]*30, 255)
 
             if n1.position[1] == SEA_LEVEL and n2.position[1] == SEA_LEVEL and n3.position[1] == SEA_LEVEL:
                 # Check if all three vertices of triangles are at sea level.
