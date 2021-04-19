@@ -16,6 +16,8 @@ from PyWire3D.Wireframe.Polygon import Polygon
 # Used in chunk generation
 SEA_LEVEL = -1
 
+MOUNTAIN_LEVEL = 5
+
 # Custom chunk generator function - World class requires this.
 def custom_chunk_gen(world, chunk_position):
     # Generate nodes, which all polygons will then be based off.
@@ -28,7 +30,7 @@ def custom_chunk_gen(world, chunk_position):
             actual_x = chunk_position[0] * world.chunk_size + x
             actual_z = chunk_position[1] * world.chunk_size + z
             
-            height = -noise.pnoise2(actual_x*0.05, actual_z*0.05, repeatx=2**32, repeaty=2**32) * 13
+            height = -noise.pnoise2(actual_x*0.05, actual_z*0.05, repeatx=2**32, repeaty=2**32) * 16
 
             if height < SEA_LEVEL:
                 height = SEA_LEVEL
@@ -50,22 +52,26 @@ def custom_chunk_gen(world, chunk_position):
             shade = n1.position[1] + n2.position[1] + n3.position[1] + n4.position[1]
             shade = max(0, shade)
 
-            if n1.position[1] == SEA_LEVEL and n3.position[1] == SEA_LEVEL:
+            shade2 = min(n1.position[1]*28, 255)
+
+            if n1.position[1] == SEA_LEVEL and n2.position[1] == SEA_LEVEL and n3.position[1] == SEA_LEVEL:
                 # Check if all three vertices of triangles are at sea level.
                 # If so, make the polygon blue instead of green.
-
-                if n2.position[1] == SEA_LEVEL:
-                    polygons.append(Polygon([n1, n2, n3], colour=(0,20,230)))
-                else:
-                    polygons.append(Polygon([n1, n2, n3], colour=(shade // 2 + 20, 185 + shade, shade * 3)))
-
-                if n4.position[1] == SEA_LEVEL:
-                    polygons.append(Polygon([n1, n3, n4], colour=(0,40,240)))
-                else:
-                    polygons.append(Polygon([n1, n3, n4], colour=(shade // 2 + 15, 195 + shade, shade * 3)))
+                polygons.append(Polygon([n1, n2, n3], colour=(0,20,230)))
+                
+            elif n1.position[1] >= MOUNTAIN_LEVEL and n2.position[1] >= MOUNTAIN_LEVEL and n3.position[1] >= MOUNTAIN_LEVEL:
+                polygons.append(Polygon([n1, n2, n3], colour=(shade2, shade2, shade2)))
 
             else:
                 polygons.append(Polygon([n1, n2, n3], colour=(shade // 2 + 20, 185 + shade, shade * 3)))
+            
+            if n1.position[1] == SEA_LEVEL and n3.position[1] == SEA_LEVEL and n4.position[1] == SEA_LEVEL:
+                polygons.append(Polygon([n1, n3, n4], colour=(0,40,240)))
+
+            elif n1.position[1] >= MOUNTAIN_LEVEL and n3.position[1] >= MOUNTAIN_LEVEL and n4.position[1] >= MOUNTAIN_LEVEL:
+                polygons.append(Polygon([n1, n3, n4], colour=(shade2 - 5, shade2 - 5, shade2 - 5)))
+
+            else:
                 polygons.append(Polygon([n1, n3, n4], colour=(shade // 2 + 15, 195 + shade, shade * 3)))
     
     # Create and return chunk.
@@ -83,7 +89,7 @@ pygame.display.set_caption('Perlin Noise Polygon Demo')
 # Pygame defines increasing y values to be downwards, so we need to flip it when rendering
 camera = Camera(display_size=(800,500), position=[4, 4, 4], clip=[0.5,24], flip_y=True)
 
-world = World(camera, chunk_size=4, chunk_spawn_radius=4)
+world = World(camera, chunk_size=4, chunk_spawn_radius=5)
 world.set_chunk_generator(custom_chunk_gen)
 
 # Main loop
@@ -108,9 +114,9 @@ while True:
         camera.move([-3*dt, 0, 0])
 
     if keys[pygame.K_w]:
-        camera.move([0, 0, 2*dt])
+        camera.move([0, 0, 3*dt])
     if keys[pygame.K_s]:
-        camera.move([0, 0, -2*dt])
+        camera.move([0, 0, -3*dt])
         
     if keys[pygame.K_SPACE]:
         camera.move([0, 3*dt, 0])

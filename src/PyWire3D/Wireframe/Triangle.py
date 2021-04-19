@@ -8,11 +8,11 @@ if USE_GFX:
         # py_gfxdraw_trigon(display, int(nodes[0][0]), int(nodes[0][1]), int(nodes[1][0]), int(nodes[1][1]), int(nodes[2][0]), int(nodes[2][1]), colour)
 else:
     from pygame.draw import polygon as py_draw_polygon
-
-class Polygon:
+    
+class Triangle:
     def __init__(self, nodes, colour=None):
         '''
-        A basic polygon class, used to create larger structures.
+        A basic triangle class, used to create larger structures.
         '''
         self.nodes = nodes
 
@@ -26,7 +26,7 @@ class Polygon:
 
     def render(self, display, camera):
         '''
-        Render the polygon (if visible == True).
+        Render the triangle (if visible == True).
         '''
         if self.visible:
             on_screen = True
@@ -38,10 +38,4 @@ class Polygon:
 
             if on_screen:
                 points = [[node.projected_point[0], node.projected_point[1]] for node in self.nodes]
-                # points = [[node.projected_point[0] + camera.display_size[0] // 2, node.projected_point[1] + camera.display_size[1] // 2] for node in self.nodes]
                 py_draw_polygon(display, self.colour, points)
-
-    def to_triangles(self):
-        triangles = []
-        # lol
-        raise NotImplementedError('Still need to do this.')

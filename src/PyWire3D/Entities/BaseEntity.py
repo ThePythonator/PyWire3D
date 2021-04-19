@@ -1,14 +1,27 @@
+import numpy
+
 from PyWire3D.Utilities.Vector import add
 
 class BaseEntity:
-    def __init__(self, position=[0,0,0]):
+    def __init__(self, position=[0, 0, 0], angle=[0, 0, 0]):
         '''
         A basic Entity class, used as the base for all entity systems with a position.
         '''
         self.position = position
+        self.angle = angle
+        # self.position = numpy.array(position)
+        # self.angle = numpy.array(angle)
 
     def translate(self, amount):
         '''
         Translate the camera by the vector [x, y, z].
         '''
+        # self.position += numpy.array(amount)
         self.position = add(self.position, amount)
+        
+    def rotate(self, amount):
+        '''
+        Rotate the camera by the angles [x, y, z].
+        '''
+        # self.angle += numpy.array(amount)
+        self.angle = add(self.angle, amount)

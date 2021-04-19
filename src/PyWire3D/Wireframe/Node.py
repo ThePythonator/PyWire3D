@@ -6,7 +6,7 @@ class Node:
         A basic node class, used for the vertices of polygons.
         '''
         self.position = position
-        self.projected_point = [0, 0]
+        self.projected_point = [0, 0, 0]
 
         self.colour = colour
         self.visible = True if colour is not None else False
@@ -15,7 +15,8 @@ class Node:
         '''
         Update the node's projected location.
         '''
-        self.projected_point = camera.project_point(self.position)
+        self.projected_point = camera.project_point(self.position, offset_to_center=True)
+        # self.projected_point = camera.project_point(self.position)
 
     def render(self, display, camera):
         '''

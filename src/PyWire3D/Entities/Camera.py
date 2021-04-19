@@ -1,4 +1,5 @@
 import math
+# import numpy
 
 from PyWire3D.Entities.BaseEntity import BaseEntity
 from PyWire3D.Utilities.Vector import get_rotation_matrix_3d, rotate_point_3d, add, matrix_to_list_3d, get_rotation_matrix_3d_y
@@ -75,8 +76,10 @@ class Camera(BaseEntity):
             flip_y = self.flip_y
 
         difference = [point[0] - self.position[0], point[1] - self.position[1], point[2] - self.position[2]]
+        # difference = numpy.subtract(numpy.array(point), self.position)
 
         d_x, d_y, d_z = matrix_to_list_3d(rotate_point_3d(difference, self.rotation_matrix))
+        # d_x, d_y, d_z = matrix_to_list_3d(numpy.multiply(self.rotation_matrix * difference))
 
         if d_z <= 0 or self.should_clip(d_z):
             return [0, 0, 0]
@@ -84,12 +87,12 @@ class Camera(BaseEntity):
         x = (d_x * self.f) / d_z
         y = (d_y * self.f) / d_z
 
+        if flip_y:
+            y = -y
+
         if offset_to_center:
             x += self.display_size[0] // 2
             y += self.display_size[1] // 2
-
-        if flip_y:
-            y = -y
 
         return [x, y, d_z]
 
