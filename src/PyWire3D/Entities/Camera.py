@@ -65,13 +65,14 @@ class Camera(BaseEntity):
         '''
         return z <= self.clip_near or z >= self.clip_far
 
-    def project_point(self, point, offset_to_center=False, flip_y=None):
+    def project_point(self, point, offset_to_center=False, flip_y=None, clip_sides=True):
         '''
         Returns the projected point [x, y, z_depth] as it should be displayed on the viewing surface (assuming center of surface is (0,0), unless offset_to_center == True).
         z_depth is only needed for calculating render order. 
         If z_depth == 0, the point has been clipped.
         If flip_y == True, y coord is inverted (changes positive to up instead of down).
         If flip_y == None, the camera's default flip_y is used.
+        If clip_sides, points with x or y coordinates deemed too far outside the screen are set as clipped points instead, to reduce unnecessary renderings, and prevent overflows.
         '''
         if flip_y is None:
             flip_y = self.flip_y
@@ -93,6 +94,10 @@ class Camera(BaseEntity):
         if offset_to_center:
             x += self.display_size_half[0]
             y += self.display_size_half[1]
+
+        if clip_sides:
+            if x < -self.display_size[0] or x > self.display_size[0] * 2 or y < -self.display_size[1] or y > self.display_size[1] * 2:
+                return [0, 0, 0]
 
         return [x, y, d_z]
 
