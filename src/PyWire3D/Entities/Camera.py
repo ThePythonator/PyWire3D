@@ -32,10 +32,17 @@ class Camera(BaseEntity):
         # Rotation of camera
         self.rotation_matrix = get_rotation_matrix_3d(self.angle)
 
+        # Entity to track
+        # self._bound_entity = None
+
     def update(self):
         '''
         Update the camera's rotation matrix.
         '''
+        # if self._bound_entity is not None:
+        #     self.position = self._bound_entity.position
+        #     self.angle = self._bound_entity.angle
+
         self.rotation_matrix = get_rotation_matrix_3d(self.angle)
 
     def render(self, display):
@@ -107,3 +114,9 @@ class Camera(BaseEntity):
         See project_point for more details.
         '''
         return self.project_point(node.position)
+
+    # def bind_entity(self, entity):
+    #     '''
+    #     Todo
+    #     '''
+    #     self._bound_entity = entity

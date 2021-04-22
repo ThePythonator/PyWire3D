@@ -209,3 +209,6 @@ def get_square_distance_3d(a, b):
     Returns the square of the distance from 3D point A to 3D point B.
     '''
     return (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2 + (a[2] - b[2]) ** 2
+
+def get_sum_square_distance_3d(p, a, b, c):
+    return get_square_distance_3d(p, a) + get_square_distance_3d(p, b) + get_square_distance_3d(p, c)

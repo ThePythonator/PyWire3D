@@ -1,9 +1,9 @@
-from PyWire3D.Utilities.Vector import get_square_distance_3d
+from PyWire3D.Utilities.Vector import get_sum_square_distance_3d, get_square_distance_3d
 
 # Note: still very much a work-in-progress
 
 class World:
-    def __init__(self, camera, chunk_size=8, chunk_spawn_radius=8):#, seed=0
+    def __init__(self, camera, chunk_size=8, chunk_spawn_radius=4):#, seed=0
         self.camera = camera
 
         self.loaded_chunks = []
@@ -50,8 +50,9 @@ class World:
         for chunk in self.loaded_chunks:
             all_shapes += chunk.shapes
             
+        # For more accuracy, use first line (reduces the chance of overlapping shapes). Second line is faster.
+        # sorted_shapes = sorted(all_shapes, key=lambda shape : get_sum_square_distance_3d(*[node.position for node in shape.nodes], self.camera.position), reverse=True)
         sorted_shapes = sorted(all_shapes, key=lambda shape : get_square_distance_3d(shape.nodes[0].position, self.camera.position), reverse=True)
-        # sorted_shapes = sorted(all_shapes, key=lambda shape : shape.nodes[0].position[2], reverse=True)
 
         for shape in sorted_shapes:
             shape.render(display, self.camera)

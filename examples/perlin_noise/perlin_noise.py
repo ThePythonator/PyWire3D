@@ -5,6 +5,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__),'..','..','src'))
 
 
 from PyWire3D.Entities.Camera import Camera
+from PyWire3D.Entities.Entity import Entity
 
 from PyWire3D.World.Chunk import Chunk
 from PyWire3D.World.World import World
@@ -16,7 +17,7 @@ from PyWire3D.Wireframe.Polygon import Polygon
 # Used in chunk generation
 SEA_LEVEL = -1
 
-MOUNTAIN_LEVEL = 4.5
+MOUNTAIN_LEVEL = 5
 
 # Custom chunk generator function - World class requires this.
 def custom_chunk_gen(world, chunk_position):
@@ -27,10 +28,15 @@ def custom_chunk_gen(world, chunk_position):
     nodes = []
     for z in range(world.chunk_size + 1):
         for x in range(world.chunk_size + 1):
+            # if z == 0 and <chunk_position-[0,1]> in loaded_chunks:
+            #     # load node row from there instead of creating them again
+            # same with other edges
+            # else:
+            
             actual_x = chunk_position[0] * world.chunk_size + x
             actual_z = chunk_position[1] * world.chunk_size + z
             
-            height = -noise.pnoise2(actual_x*0.05, actual_z*0.05, repeatx=2**32, repeaty=2**32) * 16
+            height = -noise.pnoise2(actual_x*0.04, actual_z*0.04, repeatx=2**32, repeaty=2**32) * 18
 
             if height < SEA_LEVEL:
                 height = SEA_LEVEL
@@ -87,7 +93,12 @@ display = pygame.display.set_mode((800, 500))
 pygame.display.set_caption('Perlin Noise Polygon Demo')
 
 # Pygame defines increasing y values to be downwards, so we need to flip it when rendering
-camera = Camera(display_size=(800,500), position=[4, 4, 4], clip=[0.5,24], flip_y=True)
+camera = Camera(display_size=(800,500), position=[4, 4, 4], clip=[0,24], flip_y=True)
+
+# player = Entity(position=[4, 4, 4])
+
+# Make camera follow player
+# camera.bind_entity(player)
 
 world = World(camera, chunk_size=4, chunk_spawn_radius=6)
 world.set_chunk_generator(custom_chunk_gen)
@@ -104,9 +115,6 @@ while True:
             sys.exit()
 
     keys = pygame.key.get_pressed()
-    
-    world.update()
-    camera.update()
 
     if keys[pygame.K_d]:
         camera.move([3*dt, 0, 0])
@@ -132,6 +140,10 @@ while True:
         camera.rotate([0, 0.5*dt, 0])
     if keys[pygame.K_LEFT]:
         camera.rotate([0, -0.5*dt, 0])
+        
+    
+    world.update()
+    camera.update()
 
 
     # ----------------------------------------
@@ -144,5 +156,9 @@ while True:
     # Display fps
     fps_img = font.render(str(int(1/dt)), True, (50, 200, 150))
     display.blit(fps_img, (760, 15))
+    
+    # Display position
+    fps_img = font.render(str(int(camera.position[0])) + ', ' + str(int(camera.position[1])) + ', ' + str(int(camera.position[2])), True, (50, 200, 150))
+    display.blit(fps_img, (15, 15))
 
     pygame.display.flip()

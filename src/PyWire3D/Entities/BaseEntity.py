@@ -14,14 +14,14 @@ class BaseEntity:
 
     def translate(self, amount):
         '''
-        Translate the camera by the vector [x, y, z].
+        Translate the entity by the vector [x, y, z].
         '''
         # self.position += numpy.array(amount)
         self.position = add_3d(self.position, amount)
         
     def rotate(self, amount):
         '''
-        Rotate the camera by the angles [x, y, z].
+        Rotate the entity by the angles [x, y, z].
         '''
         # self.angle += numpy.array(amount)
         self.angle = add_3d(self.angle, amount)

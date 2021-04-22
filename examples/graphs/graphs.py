@@ -17,7 +17,7 @@ from PyWire3D.Wireframe.Polygon import Polygon
 def custom_chunk_gen(world, chunk_position):
     # Generate nodes, which all polygons will then be based off.
 
-    if chunk_position[0] < -4 or chunk_position[0] > 4 or chunk_position[1] < -4 or chunk_position[1] > 4:
+    if chunk_position[0] < -9 or chunk_position[0] > 9 or chunk_position[1] < -9 or chunk_position[1] > 9:
         # Limit the size of the map, so it isn't infinite.
         return Chunk(chunk_position, [], [])
 
@@ -69,7 +69,7 @@ pygame.display.set_caption('3D Graph Polygon Demo')
 # Pygame defines increasing y values to be downwards, so we need to flip it when rendering
 camera = Camera(display_size=(800,500), position=[4, 4, 4], clip=[0.5,40], flip_y=True)
 
-world = World(camera, chunk_size=8, chunk_spawn_radius=4)
+world = World(camera, chunk_size=4, chunk_spawn_radius=6)
 world.set_chunk_generator(custom_chunk_gen)
 
 # Main loop
