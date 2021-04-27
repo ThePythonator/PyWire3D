@@ -1,4 +1,4 @@
-USE_GFX = True
+USE_GFX = False
 
 if USE_GFX:
     from pygame.gfxdraw import filled_trigon as py_gfxdraw_trigon

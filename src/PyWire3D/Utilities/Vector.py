@@ -27,6 +27,9 @@ def add_3d(a, b):
     '''
     return [a[0] + b[0], a[1] + b[1], a[2] + b[2]]
 
+def scale_3d(a, b):
+    return [a[0] * b, a[1] * b, a[2] * b]
+
 # def rotate_point_3d(point, rotation_matrix):
 #     '''
 #     Returns the 3D point rotated around the origin, using the supplied rotation matrix.
