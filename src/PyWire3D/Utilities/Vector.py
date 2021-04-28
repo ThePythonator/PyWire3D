@@ -30,6 +30,12 @@ def add_3d(a, b):
 def scale_3d(a, b):
     return [a[0] * b, a[1] * b, a[2] * b]
 
+def clamp_3d(a, bounds):
+    return [clamp_1d(a[0], bounds), clamp_1d(a[1], bounds), clamp_1d(a[2], bounds)]
+
+def clamp_1d(a, bounds):
+    return max(bounds[0], min(bounds[1], a))
+
 # def rotate_point_3d(point, rotation_matrix):
 #     '''
 #     Returns the 3D point rotated around the origin, using the supplied rotation matrix.

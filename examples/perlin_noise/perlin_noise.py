@@ -93,14 +93,14 @@ display = pygame.display.set_mode((800, 500))
 pygame.display.set_caption('Perlin Noise Polygon Demo')
 
 # Pygame defines increasing y values to be downwards, so we need to flip it when rendering
-camera = Camera(display_size=(800,500), position=[4, 4, 4], clip=[0,24], flip_y=True)
+camera = Camera(display_size=(800,500), position=[4, 4, 4], clip=[0,22], flip_y=True)
 
 # player = Entity(position=[4, 4, 4])
 
 # Make camera follow player
 # camera.bind_entity(player)
 
-world = World(camera, chunk_size=4, chunk_spawn_radius=6)
+world = World(camera, chunk_size=4, chunk_spawn_radius=5)
 world.set_chunk_generator(custom_chunk_gen)
 
 # Main loop

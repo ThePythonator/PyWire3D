@@ -15,8 +15,9 @@ from PyWire3D.Wireframe.Polygon import Polygon
 
 from PyWire3D.Parsers.ObjParser import ObjFile
 
-from PyWire3D.Utilities.Vector import scale_3d
+from PyWire3D.Utilities.Vector import scale_3d, add_3d, clamp_3d
 
+import random
 
 # Used in chunk generation
 # model = ObjFile.read('demo.obj')
@@ -27,12 +28,16 @@ def custom_chunk_gen(world, chunk_position):
     # For simplicity, load everything into one chunk.
 
     if chunk_position == [0, 0]:
-        nodes = [Node(vertex) for vertex in model.vertices]
+        nodes = [Node(scale_3d(vertex, 1)) for vertex in model.vertices]
 
         triangles = []
         
         for face in model.faces:
-            triangles.append(Polygon([nodes[vertex_index - 1] for vertex_index in face.vertex_indices], colour=scale_3d(face.material.Kd, 255)))
+            # Randomly modify colour shade slightly to add variation
+            c = clamp_3d(add_3d(scale_3d(face.material.Kd, 255), (random.randint(-10, 10), random.randint(-10, 10), random.randint(-10, 10))), (0, 255))
+            triangles.append(Polygon([nodes[vertex_index - 1] for vertex_index in face.vertex_indices], colour=c))
+
+            # triangles.append(Polygon([nodes[vertex_index - 1] for vertex_index in face.vertex_indices], colour=scale_3d(face.material.Kd, 255)))
 
         return Chunk(chunk_position, triangles, nodes)
 
@@ -50,8 +55,8 @@ display = pygame.display.set_mode((800, 500))
 pygame.display.set_caption('.obj File Viewer Polygon Demo')
 
 # Pygame defines increasing y values to be downwards, so we need to flip it when rendering
-camera = Camera(display_size=(800,500), position=[0, 0, 0], clip=[0,32], flip_y=True)
-world = World(camera, chunk_size=4, chunk_spawn_radius=6)
+camera = Camera(display_size=(800,500), position=[-4, 4, -12], clip=[0,64], flip_y=True)
+world = World(camera, chunk_size=8, chunk_spawn_radius=8)
 world.set_chunk_generator(custom_chunk_gen)
 
 # Main loop
@@ -100,7 +105,7 @@ while True:
     # ----------------------------------------
     # Render section
     
-    display.fill((30, 100, 200))
+    display.fill((30, 40, 50))
 
     world.render(display)
     

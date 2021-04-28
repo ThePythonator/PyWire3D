@@ -50,9 +50,13 @@ class World:
         for chunk in self.loaded_chunks:
             all_shapes += chunk.shapes
             
-        # For more accuracy, use first line (reduces the chance of overlapping shapes). Second line is faster.
+        # Each of the following 3 lines range from fastest to slowest, from least accurate to most accurate.
+        # Note: the second line only works if all polygons have the 3 nodes.
+
+        # sorted_shapes = sorted(all_shapes, key=lambda shape : get_square_distance_3d(shape.nodes[0].position, self.camera.position), reverse=True)
         # sorted_shapes = sorted(all_shapes, key=lambda shape : get_sum_square_distance_3d(*[node.position for node in shape.nodes], self.camera.position), reverse=True)
-        sorted_shapes = sorted(all_shapes, key=lambda shape : get_square_distance_3d(shape.nodes[0].position, self.camera.position), reverse=True)
+        sorted_shapes = sorted(all_shapes, key=lambda shape : min([get_square_distance_3d(node.position, self.camera.position) for node in shape.nodes]), reverse=True)
+
 
         for shape in sorted_shapes:
             shape.render(display, self.camera)
